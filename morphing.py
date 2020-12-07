@@ -1,8 +1,6 @@
 import argparse
-import matplotlib.pyplot as plt
 import numpy as np
 from pai_io import imread, imsave
-import parse
 from PIL import Image
 from skimage.draw import line
 import time
@@ -11,14 +9,15 @@ def parse_lines(lines_file_name):
     lines_i = np.empty([0, 2, 2], dtype=np.float32)
     lines_g = np.empty([0, 2, 2], dtype=np.float32)
     with open(lines_file_name) as lines_file:
-        format_string = "{:d}: {:d}, {:d}, {:d}, {:d}, {:d}, {:d}, {:d}, {:d}"
         while True:
             line_pair = lines_file.readline()
             if not line_pair:
                 break
-            digits = list(parse.parse(format_string, line_pair))
-            lines_i = np.append(lines_i, [[[digits[1], digits[2]], [digits[3], digits[4]]]], axis=0)
-            lines_g = np.append(lines_g, [[[digits[5], digits[6]], [digits[7], digits[8]]]], axis=0)
+            line_pair = line_pair.split(': ')[1]
+            digits = line_pair.split(', ')
+            digits = [int(x) for x in digits]
+            lines_i = np.append(lines_i, [[[digits[0], digits[1]], [digits[2], digits[3]]]], axis=0)
+            lines_g = np.append(lines_g, [[[digits[4], digits[5]], [digits[6], digits[7]]]], axis=0)
     return lines_i, lines_g
 
 def draw_lines_in_image(img, lines, color):
