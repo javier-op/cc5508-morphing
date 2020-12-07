@@ -109,6 +109,7 @@ if __name__ == '__main__':
     t = 0.
 
     imgs = []
+    print('Starting image generation, may take a while.')
     for i in range(args.n):
         t += dt
         start = time.time()
