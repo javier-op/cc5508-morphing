@@ -45,7 +45,7 @@ def transform_point(point, l, l_prime):
     return p_prime + u*(q_prime-p_prime)/np.linalg.norm(q-p) +\
            v*perp(q_prime-p_prime)/np.linalg.norm(q_prime-p_prime)
 
-def bilineal_interpolation(point, origin_image, fill_color):
+def bilinear_interpolation(point, origin_image, fill_color):
     max_x = origin_image.shape[0] - 1
     max_y = origin_image.shape[1] - 1
     x0 = int(np.floor(point[0]))
@@ -83,7 +83,7 @@ def warping_multi_lines(lines_g, lines_i, img_i, fill_color):
                 w_accum += w
             dx /= w_accum
             x_i = x_g + dx
-            img_g[i][j] = bilineal_interpolation(x_i, img_i, fill_color)
+            img_g[i][j] = bilinear_interpolation(x_i, img_i, fill_color)
     return img_g.astype(np.uint8)
 
 def blending(t, img_i, img_g):
@@ -114,8 +114,8 @@ if __name__ == '__main__':
         t += dt
         start = time.time()
         lines_t = lines_to_time_t(lines_i, lines_g, t)
-        warp1 = warping_multi_lines(lines_t, lines_i, img_i, (138, 143, 147))
-        warp2 = warping_multi_lines(lines_t, lines_g, img_g, (102, 105, 98))
+        warp1 = warping_multi_lines(lines_t, lines_i, img_i, (0, 0, 0))
+        warp2 = warping_multi_lines(lines_t, lines_g, img_g, (0, 0, 0))
         morph = blending(t, warp1, warp2)
         end = time.time()
         print('Image {} of {} generated, took {} seconds.'.format(i+1, args.n, end-start))
@@ -124,25 +124,3 @@ if __name__ == '__main__':
     gif_array = [img_i]*4 + imgs + [img_g]*4 + imgs[::-1]
     gif_array = [Image.fromarray(img) for img in gif_array]
     gif_array[0].save(fp='morphing.gif', format='GIF', append_images=gif_array[1:], save_all=True, duration=200, loop=0)
-
-    fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(9, 9))
-    axes[0][0].imshow(img_i)
-    axes[0][0].axis('off')
-    axes[0][1].imshow(imgs[0])
-    axes[0][1].axis('off')
-    axes[0][2].imshow(imgs[1])
-    axes[0][2].axis('off')
-    axes[1][0].imshow(imgs[2])
-    axes[1][0].axis('off')
-    axes[1][1].imshow(imgs[3])
-    axes[1][1].axis('off')
-    axes[1][2].imshow(imgs[4])
-    axes[1][2].axis('off')
-    axes[2][0].imshow(imgs[5])
-    axes[2][0].axis('off')
-    axes[2][1].imshow(imgs[6])
-    axes[2][1].axis('off')
-    axes[2][2].imshow(img_g)
-    axes[2][2].axis('off')
-    fig.tight_layout()
-    fig.savefig('grid.png')
